@@ -1,0 +1,58 @@
+CREATE TABLE [dbo].[EmployeeMaster](
+	[EMPLOYEEID] [int] IDENTITY(1,1) NOT NULL,
+	[NAME] [nvarchar](50) NULL,
+	[DESIGNATION] [nvarchar](50) NULL,
+	[SALARY] [int] NULL,
+	[STATE] [nvarchar](50) NULL,
+	[COUNTRY] [nvarchar](50) NULL,
+	[DEPTID] [int] NULL,
+ CONSTRAINT [PK_EmployeeMaster] PRIMARY KEY CLUSTERED 
+(
+	[EMPLOYEEID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[EmployeeMaster]  WITH CHECK ADD  CONSTRAINT [FK_EmployeeMaster_DepartmentMaster] FOREIGN KEY([DEPTID])
+REFERENCES [dbo].[DepartmentMaster] ([DeptID])
+GO
+
+ALTER TABLE [dbo].[EmployeeMaster] CHECK CONSTRAINT [FK_EmployeeMaster_DepartmentMaster]
+GO
+
+
+CREATE TABLE [dbo].[DepartmentMaster](
+	[DeptID] [int] IDENTITY(1,1) NOT NULL,
+	[DeptName] [varchar](50) NULL,
+	[DeptCode] [varchar](5) NULL,
+	[Remarks] [varchar](50) NULL,
+ CONSTRAINT [PK_DepartmentMaster] PRIMARY KEY CLUSTERED 
+(
+	[DeptID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+CREATE PROC USP_GETEMPLOYEEANDDEPTMASTERDATA
+AS
+BEGIN
+	
+	/* Employee Master Data */
+	select ROW_NUMBER() OVER(ORDER BY NAME) AS ROWNUMBER,
+		name,DESIGNATION,SALARY,STATE,COUNTRY,DM.DeptName from [dbo].[EmployeeMaster] EM
+		join [dbo].[DepartmentMaster] DM on EM.DEPTID = DM.DeptID
+		ORDER BY NAME
+
+	/* Department Master Data */
+	select ROW_NUMBER() OVER(ORDER BY DeptName) AS ROWNUMBER,
+	DeptName, DeptCode from dbo.DepartmentMaster
+	ORDER BY DeptName
+
+END
